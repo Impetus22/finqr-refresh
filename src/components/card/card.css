@@ -1,0 +1,205 @@
+.card{
+    height: 100%;
+    width: 100%;
+
+    transform-style: preserve-3d;
+    position: relative;
+
+    border-radius: 5px;
+    border: 5px solid white;
+    box-shadow: 0px 0px 15px rgba(0,0,0,0.8);
+
+    /*user-select: none;  */
+}
+.card-front,
+.card-back {
+    height: 100%;
+    width: 100%;
+
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    position: absolute;
+
+/*     display: flex;  
+    justify-content: center;
+    align-items: center; */
+
+    font-family: Montserrat;
+    font-weight: 800;
+    font-size: 20px;
+    color: white;
+    text-shadow: 2px 2px 10px rgba(214, 213, 213, 0.9);
+}
+.card-front {
+    background-color: #25b2d16d;
+}
+.card-back {
+    background-color: #e8982790;  /*#e8982790*/
+    transform: rotateY(180deg);
+    display: flex;  
+    justify-content: center;
+    align-items: center;
+}
+
+/* da qui css mio*/
+
+
+  .copy-tooltip {
+    position: relative;
+    top: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    font-size: 12px; /* Dimensione del testo */
+    padding: 4px 8px;
+    border-radius: 4px;
+    transform: translateY(-100%);
+  }
+  
+  /* Stile dell'icona di copia */
+  .copy-icon {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    transform: translateY(-50%);
+    cursor: pointer;
+  }
+  
+  .flip-button {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    padding: 8px 16px;
+    background-color: #ffffff;
+    border: 1px solid #000000;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #000000; /* Cambia questo colore con quello desiderato */
+    font-size: 12px;
+    font-family: Montserrat;
+    font-weight: 600;
+
+  }
+
+  .card-back-content {
+    width: 100%; /* Imposta la larghezza al 100% del contenitore genitore */
+    max-width: 100%; /* Imposta la larghezza massima al 100% per adattarsi al contenitore genitore */
+  }
+  
+  
+  .back-label {
+    font-size: 20px;
+    font-weight: bold;
+    color: rgb(0, 0, 0);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .back-text-container {
+      width: 100%; /* Imposta la larghezza al 100% del contenitore */
+  }
+  
+  .back-text {
+    height: 100%;
+    width: 100%;
+    border: none;
+    background-color: transparent;
+    font-family: Montserrat;
+    font-weight: 600;
+    font-size: 12px;
+    color: white;
+    text-align: center;
+    cursor: pointer;
+    outline: none; /* Rimuove il bordo evidenziato sul click */
+    margin-top: 20px;
+    white-space: pre-wrap; /* Avvolge il testo senza tagliarlo */
+    
+  }
+
+  .front-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+  .status-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+    margin-top: 10px;
+  }
+  .status-circle {
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background-color: rgb(25, 242, 25);
+    margin-right: 5px;
+    border: 3px solid green; /* Add border properties */
+
+  }
+  .download-container {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+    margin-left: 60px;
+
+  }
+  
+  .download-icon {
+    margin-right: 5px;
+  }
+
+  .status-text{
+    font-family: Montserrat;
+    font-weight: 800;
+    font-size: 12px;
+    color: white;
+    text-shadow: none;
+  }
+  .download-text{
+    font-family: Montserrat;
+    font-weight: 800;
+    font-size: 12px;
+    color: white;
+    text-shadow: none;
+  }
+
+  .qrcode-container {
+    border: 5px solid #ddd;
+    border-radius: 10px;
+    padding: 5px;
+  }
+
+  .reward-info{
+    font-family: Montserrat;
+    font-weight: 800;
+    font-size: 12px;
+    color: white;
+    text-shadow: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .reward-text-container {
+    width: 200px; /* Modifica la larghezza in base al tuo design */
+    height: 100px; /* Modifica l'altezza in base al tuo design */
+    overflow-y: scroll; /* Abilita lo scroll verticale */
+    border: 2px solid #13918b; /* Aggiungi un bordo se lo desideri */
+    padding: 10px; /* Aggiungi padding per distanziare il testo dal bordo */
+    border-radius: 10px;
+
+  }
+
+  .download-container:hover {
+    cursor: pointer;
+    color: #0b2e7a;
+
+}
+
+.download-text:hover{
+  cursor: pointer;
+  color: #0b2e7a;
+
+}

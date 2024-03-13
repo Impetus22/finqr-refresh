@@ -1,0 +1,53 @@
+.flippable-card-container{
+    height: 410px;
+    width: 250px;
+    perspective: 1000px;
+    position: relative;
+
+}
+
+.buttons-container {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin-top: 15px;
+}
+
+.buttons-container button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 10px;
+  transition: 0.3s ease-in-out;
+}
+
+/* .buttons-container button:hover {
+  background-color: #ddd;
+}
+ */
+.left-button:hover{
+  background-color: #c51515c9;
+}
+
+.center-button:hover{
+  background-color: #bfc515c9;
+}
+
+.right-button:hover{
+  background-color: #155cc5c9;
+}
+
+.buttons-container button svg {
+  font-size: 20px;
+  margin-bottom: 5px;
+}
+
+.buttons-container button span {
+  font-size: 14px;
+  color: #eeeaea;
+}
