@@ -6,7 +6,7 @@ import { FiTrash, FiPlusCircle, FiEdit } from 'react-icons/fi'; // Importa le ic
 import { Link } from "react-router-dom";
 
 
-function FlippableCard() {
+function FlippableCard({ uuid, text, available, rewardType, rewardAmount, objectAssociated, description, contact }) {
 
     const [showFront,setShowFront] = useState(true);
 
@@ -17,9 +17,19 @@ function FlippableCard() {
                 timeout={300}
                 classNames='flip'
             >
-                <Card onClick={() => {
-                    setShowFront((v) => !v);
-                }}/>
+                <Card
+                    uuid={uuid}
+                    text={text}
+                    available={available}
+                    rewardType={rewardType}
+                    rewardAmount={rewardAmount}
+                    objectAssociated={objectAssociated}
+                    description={description}
+                    contact={contact}
+                    onClick={() => {
+                        setShowFront((v) => !v);
+                    }}
+                />
             </CSSTransition>
             <div className="buttons-container">
   <button className="left-button">

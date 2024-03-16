@@ -28,13 +28,15 @@ const Dashboard = () => {
         confirmed: true,
         token: accessToken,
         refreshToken: refreshToken,
-        cookies: true
+        cookies: true,
+        loggedIn: true
       };}else{
         return {
           confirmed: false,
           token: '',
           refreshToken: '',
-          cookies: false
+          cookies: false,
+          loggedIn: false
         };
       }
     })
@@ -84,9 +86,9 @@ const Dashboard = () => {
     const confToken = urlParams.get('confirmationToken');
     if (confToken) {
       fetchData(confToken);
-      urlParams.delete('confirmationToken');
+/*       urlParams.delete('confirmationToken');
       // Aggiorna l'URL senza il parametro 'confirmationToken'
-      window.history.replaceState({}, document.title, `${window.location.pathname}${urlParams.toString()}`);
+      window.history.replaceState({}, document.title, `${window.location.pathname}${urlParams.toString()}`); */
     }else{
       //chiamata al backend per recuperare QR
       if(state.confirmed && state.cookies){
@@ -105,19 +107,19 @@ const Dashboard = () => {
       setState({
         confirmed: true, // Nuovo valore di confirmed
         token: fetchDataResult.token, // Nuovo valore di token1
-        refreshToken: fetchDataResult.refreshToken // Nuovo valore di token2
+        refreshToken: fetchDataResult.refreshToken, 
+        loggedIn: false 
       });
       //return setConfirmed(true);
 
     } else if (fetchDataResult && fetchDataResult.esito.codice !== 200) {
       setIsLoading(false);
-      toast.error(fetchDataResult.esito.descrizione);
     }
   }, [fetchDataResult]);
 
 
   useEffect(() => {
-    if (state.confirmed && !state.cookies) {
+    if (state.confirmed && !state.loggedIn) {
       //todo settare cookie con tempo giusto ecc..
       const expireDate = new Date();
       expireDate.setDate(expireDate.getDate() + 1);
@@ -129,21 +131,39 @@ const Dashboard = () => {
       cookies: true
     }));
     setIsLoading(false);
-    toast.success("Welcome");
+    toast.success("Email confirmed!");
+    } if(state.loggedIn){
+      return
     }
-  }, [state.confirmed]);
 
-  const [cards] = useState([
+    
+
+  }, [state.confirmed,state.loggedIn]);
+
+/*   const [cards] = useState([
     <FlippableCard key={1} />,
     <FlippableCard key={2} />,
     <FlippableCard key={3} />,
     // Aggiungi altre card se necessario
-  ]);
+  ]); */
 
+  const flippableCards = qrList.map((qr, index) => (
+    <FlippableCard
+        key={index}
+        uuid="uuid"//{qr.uuid}
+        text="text"       //{qr.text}
+        available={true}
+        rewardType={qr.rewardModality}
+        rewardAmount={qr.rewardAmount}
+        objectAssociated={qr.objectAssociated}
+        description={qr.description}
+        contact={qr.contact}
+    />
+));
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
 
   const nextCard = () => {
-    setCurrentCardIndex((prevIndex) => (prevIndex === cards.length - 1 ? prevIndex : prevIndex + 1));
+    setCurrentCardIndex((prevIndex) => (prevIndex === flippableCards.length - 1 ? prevIndex : prevIndex + 1));
   };
 
   const prevCard = () => {
@@ -189,8 +209,18 @@ const Dashboard = () => {
             <div className="relative z-1 max-w-[62rem] mx-auto text-center mb-[0.875rem] md:mb-10 lg:mb-[1.25rem]">
               <h5 className="h5 mb-3">Welcome user, have a look at your QRs:</h5>
             </div>
+
+            {qrList.length === 0 ? (
+                <div className="text-center mb-4">
+                  <p className="mb-2">Oh no, no QRs available.</p>
+                  <Link to="/purchase" className="text-blue-500 hover:underline">
+                    Get yours now
+                  </Link>
+                </div>
+              ) : ( 
+                <>
             <div className="flex justify-center items-center mt-4 mb-3">
-        {cards.map((_, index) => (
+        {flippableCards.map((_, index) => (
           <button
             key={index} 
             className={`mx-2 w-2 h-2 rounded-full ${index === currentCardIndex ? 'bg-blue-600' : 'bg-gray-300'}`}
@@ -226,7 +256,7 @@ const Dashboard = () => {
 
 
         <div className="relative">
-          {cards.map((card, index) => (
+          {flippableCards.map((card, index) => (
             <AnimatedCard key={index} index={index} currentIndex={currentCardIndex}>
             <div className={`${index === currentCardIndex ? 'block' : 'hidden'}`}>
               {card}
@@ -239,7 +269,7 @@ const Dashboard = () => {
 
 
         <div className="absolute right-1 md:right-60 lg:right-96 xl:right-120 top-1/2 transform -translate-y-1/2">
-          <button onClick={nextCard} className={`  focus:outline-none ${currentCardIndex === cards.length - 1 ? 'text-gray-700 cursor-not-allowed' : 'text-gray-200 cursor-pointer'}`}>
+          <button onClick={nextCard} className={`  focus:outline-none ${currentCardIndex === flippableCards.length - 1 ? 'text-gray-700 cursor-not-allowed' : 'text-gray-200 cursor-pointer'}`}>
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
             </svg>
@@ -250,8 +280,9 @@ const Dashboard = () => {
         )}
       </>
     ) }
-      {/* {console.log("STATE:",state)} */}
-      
+    </>
+            )}
+
     </Section>
   );
 };

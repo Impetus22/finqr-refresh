@@ -5,7 +5,7 @@ import "./card.css"
 import "./flip-transition.css"
 
 
-function Card({onClick}) {
+function Card({ uuid, text, available, rewardType, rewardAmount, objectAssociated, description, contact, onClick }) {
 
     const textRef = useRef(null);
     const [copied, setCopied] = useState(false); // Stato per tracciare se il testo è stato copiato con successo
@@ -32,12 +32,14 @@ function Card({onClick}) {
 
     
 
+/*     const uuid = "8d8ea0eb";
     const text = "8d8ea0eb-da88-46a0-b835-11fb005b3735";
     const available = true; // Esempio: disponibile
     const rewardType = "Tipo di ricompensa";
     const rewardAmount = "10";
     const objectAssociated = "Oggetto associato";
-    const contact = "Contatto";
+    const description = "";
+    const contact = "Contatto"; */
 
     return(
         
@@ -51,7 +53,7 @@ function Card({onClick}) {
                     ref={textRef}
                     type="text"
                     readOnly
-                    value={text}
+                    value={uuid}
                     className="back-text"
                 />
                 <div className="copy-icon" onClick={copyTextToClipboard}>
