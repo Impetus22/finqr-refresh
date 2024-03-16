@@ -1,12 +1,138 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Section from '../components/Section'
 import FlippableCard from "../components/card/flipp-card";
 import AnimatedCard from '../components/AnimatedCard';
 import "./Dashboard.css";
+import { Link } from 'react-router-dom';
+import { Spinner } from 'react-bootstrap';
+import { BASE_PATH } from '../constants';
+import toast from 'react-hot-toast';
 
 
 const Dashboard = () => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [fetchDataResult, setFetchDataResult] = useState(null); // Nuova variabile di stato
+  const [qrList, setQrList] = useState([]);
+
+  const [state, setState] = useState(() => {
+    // Recupera i token dai cookie
+    const cookies = document.cookie.split('; ');
+    const accessTokenCookie = cookies.find(cookie => cookie.startsWith('accessToken'));
+    const refreshTokenCookie = cookies.find(cookie => cookie.startsWith('refreshToken'));
+    
+    // Se sono presenti token nei cookie, restituisci gli stati con i valori dei token
+    if (accessTokenCookie && refreshTokenCookie) {
+      const accessToken = accessTokenCookie.split('=')[1];
+      const refreshToken = refreshTokenCookie.split('=')[1];
+      return {
+        confirmed: true,
+        token: accessToken,
+        refreshToken: refreshToken,
+        cookies: true
+      };}else{
+        return {
+          confirmed: false,
+          token: '',
+          refreshToken: '',
+          cookies: false
+        };
+      }
+    })
   
+
+
+  async function fetchData(confToken) {
+    try {
+      const response = await fetch(BASE_PATH + `/api/v1/auth/register/confirm?confirmationToken=${confToken}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+      const data = await response.json();
+      return setFetchDataResult(data);
+    } catch (error) {
+      setIsLoading(false);
+      //gestire errore
+    }
+  }
+
+  const fetchUserQr = async () => {
+    try {
+      const response = await fetch(BASE_PATH + '/api/v1/user/qrs', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${state.token}`, // Assicurati di includere l'access token nell'intestazione
+          'Content-Type': 'application/json',
+        }
+      });
+      const data = await response.json();
+      console.log('Lista di oggetti dell\'utente:', data);
+      if(response.status===200){
+        setQrList(data.qrs);       //setto lo state dei qr
+        console.log(data.qrs);
+      }
+
+      setIsLoading(false);
+    } catch (error) {
+      console.error('Errore durante il recupero della lista di oggetti:', error);
+    }
+  };
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const confToken = urlParams.get('confirmationToken');
+    if (confToken) {
+      fetchData(confToken);
+      urlParams.delete('confirmationToken');
+      // Aggiorna l'URL senza il parametro 'confirmationToken'
+      window.history.replaceState({}, document.title, `${window.location.pathname}${urlParams.toString()}`);
+    }else{
+      //chiamata al backend per recuperare QR
+      if(state.confirmed && state.cookies){
+        
+        fetchUserQr(); 
+
+      }
+      else{
+        setIsLoading(false);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (fetchDataResult && fetchDataResult.esito.descrizione === "OK - success") { //todo controllare
+      setState({
+        confirmed: true, // Nuovo valore di confirmed
+        token: fetchDataResult.token, // Nuovo valore di token1
+        refreshToken: fetchDataResult.refreshToken // Nuovo valore di token2
+      });
+      //return setConfirmed(true);
+
+    } else if (fetchDataResult && fetchDataResult.esito.codice !== 200) {
+      setIsLoading(false);
+      toast.error(fetchDataResult.esito.descrizione);
+    }
+  }, [fetchDataResult]);
+
+
+  useEffect(() => {
+    if (state.confirmed && !state.cookies) {
+      //todo settare cookie con tempo giusto ecc..
+      const expireDate = new Date();
+      expireDate.setDate(expireDate.getDate() + 1);
+      document.cookie = `accessToken=${state.token}; path=/; expires=${expireDate.toUTCString()}`;
+      document.cookie = `refreshToken=${state.refreshToken}; path=/; expires=${expireDate.toUTCString()}`;
+     //setCookies(true);
+     setState(prevState => ({
+      ...prevState,
+      cookies: true
+    }));
+    setIsLoading(false);
+    toast.success("Welcome");
+    }
+  }, [state.confirmed]);
+
   const [cards] = useState([
     <FlippableCard key={1} />,
     <FlippableCard key={2} />,
@@ -39,11 +165,31 @@ const Dashboard = () => {
 
   return (
     <Section className="pt-[10rem] -mt-[8.25rem] -mb-[-3rem]" crosses>
-      <div className="relative z-1 max-w-[62rem] mx-auto text-center mb-[0.875rem] md:mb-10 lg:mb-[1.25rem]">
-        <h5 className="h5 mb-3">Welcome user, have a look at your QRs:</h5>
+      {console.log("STATE",state)}
+      {isLoading ? (
+      // Mostra il codice per la pagina di caricamento se isLoading è true
+      <div className="loading-page">
+        <Spinner animation="border" variant="primary" />
+        <p>Caricamento...</p>
       </div>
-
-      <div className="flex justify-center items-center mt-4 mb-3">
+    ) : (
+      <>
+        {!state.confirmed && (
+          // Mostra "devi autenticarti per accedere" se non sei autenticato e non hai confermato
+          <div className="text-center">
+            <h5 className="h5 mb-3">You need to login to access this page</h5>
+            <Link to="/login" className="text-blue-500 hover:underline">
+              Login
+            </Link>
+          </div>
+        )}
+        {state.confirmed && (
+          // Mostra il contenuto della sezione se lo stato è confermato
+          <>
+            <div className="relative z-1 max-w-[62rem] mx-auto text-center mb-[0.875rem] md:mb-10 lg:mb-[1.25rem]">
+              <h5 className="h5 mb-3">Welcome user, have a look at your QRs:</h5>
+            </div>
+            <div className="flex justify-center items-center mt-4 mb-3">
         {cards.map((_, index) => (
           <button
             key={index} 
@@ -100,6 +246,12 @@ const Dashboard = () => {
           </button>
         </div>
       </div>
+          </>
+        )}
+      </>
+    ) }
+      {/* {console.log("STATE:",state)} */}
+      
     </Section>
   );
 };

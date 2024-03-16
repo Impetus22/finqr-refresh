@@ -27,9 +27,9 @@ const Header = () => {
     }
 
     const handleClickLoad = (url) => {
-        if (url === '/dashboard') {
+        /* if (url === '/dashboard') {
             window.location.href = `${url}?refresh=${Date.now()}`;
-        }
+        } */
       };
 
   return (

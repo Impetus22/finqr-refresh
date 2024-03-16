@@ -28,11 +28,26 @@ import card4icon from "../assets/card4icon.svg";
 import card5icon from "../assets/card5icon.svg"; 
 import card6icon from "../assets/card6icon.svg"; 
 
+  export const BASE_PATH = "http://localhost:8080";
+
+  export const toastStyle = {
+    backgroundColor: 'rgba(255, 255, 255, 0.8)', // Trasparente
+    color: '#3366ff', // Blu
+    borderRadius: '10px', // Angoli arrotondati
+    padding: '16px', // Spaziatura interna
+    fontSize: '16px', // Dimensione del carattere
+  
+    // Personalizzazione della spunta
+    '&.success .icon svg': {
+      fill: '#3366ff', // Colore verde blu della spunta
+    },
+  };
+  
   export const navigation = [
     {
       id: "0",
       title: "Home",
-      url: "/",
+      url: "/home",
     },
     {
       id: "1",

@@ -3,9 +3,10 @@ import React, { useState } from 'react'
 import { FcGoogle } from 'react-icons/fc';
 import { FaFacebookF } from 'react-icons/fa6';
 import Section from '../components/Section';
-import { Link } from 'react-router-dom';
-import axios from "axios";
-import { useSignIn } from 'react-auth-kit';
+import { Link, useNavigate } from 'react-router-dom';
+import { disablePageScroll, enablePageScroll } from 'scroll-lock';
+import toast from 'react-hot-toast';
+import { BASE_PATH } from '../constants';
 
 
 
@@ -14,10 +15,85 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
 
   const [email, setEmail] = useState('');
+  const [errorEmail, setErrorEmail] = useState('');
+
+  const [emailToReset, setEmailToReset] = useState('');
+
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const navigate = useNavigate();
 
-  const signIn = useSignIn();
+  const handleModalOpen = () => {
+    setShowModal(true);
+    disablePageScroll();
+  };
+
+  const handleModalClose = () => {
+    setShowModal(false);
+    enablePageScroll();
+    setErrorEmail('');
+    setEmailToReset('');
+
+  };
+  const handleEmailChange = (e) => {
+    setEmailToReset(e.target.value);
+  };
+
+  const handleSendEmail = async () => {
+    // Aggiungi qui la logica per inviare l'email di recupero password
+    setErrorEmail('');
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    console.log(emailToReset)
+    if (!emailRegex.test(emailToReset)) {
+      setErrorEmail('Email non valida');
+      setLoading(false);
+      return;
+    }
+    try {
+      // Simulazione di una richiesta di login al backend
+
+      const response = await fetch(BASE_PATH+`/api/v1/auth/user/resetPassword?email=${emailToReset}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      const responseData = await response.json();
+      if (response.status === 200) {
+        //todo settare cookie con tempo giusto ecc..
+        toast.success("A reset link was sent to your email, please follow the instructions", {
+          style: {
+            backgroundColor: '#6cb2f2', // Blue background
+            color: '#ffffff', // White text
+          },
+        });
+
+} else{
+  if(response.status === 403){
+    toast.error(responseData.esito.descrizione);
+    return;
+  }
+  if(response.status === 404){
+    toast.error("Email not found in our server");
+    return;
+  }
+  //todo err boundary
+  toast.error("Something went wrong");
+  return;
+}
+      // Dopo aver ricevuto una risposta positiva, puoi fare il redirect alla dashboard
+      console.log(response)
+    } catch (error) {
+      console.error('Errore durante il reset della password:', error);
+    } finally {
+          setShowModal(false);
+          enablePageScroll();
+    }
+    // Chiudi la modale dopo l'invio dell'email
+  };
+
+
 
   const handleLogin = async () => {
     setLoading(true);
@@ -39,22 +115,40 @@ const Login = () => {
        return;
      }
 
+     
     try {
       // Simulazione di una richiesta di login al backend
-      const response = await axios.post('http://localhost:8080/api/v1/auth/login', {
-        email,
-        password,
+      const response = await fetch(BASE_PATH+"/api/v1/auth/logon", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
       });
+      console.log(response)
 
-      signIn({
-        token: response.data.token,
-        expiresIn: 3600,
-        tokenType: "Bearer",
-        authState: {email: email}
-      })
-      // Dopo aver ricevuto una risposta positiva, puoi fare il redirect alla dashboard
-      console.log("redirect to dashboard",response)
+      const responseData = await response.json();
+      console.log(responseData)
+
+      if (response.status === 200) {
+              //todo settare cookie con tempo giusto ecc..
+        const expireDate = new Date();
+        expireDate.setDate(expireDate.getDate() + 1);
+        document.cookie = `accessToken=${responseData.token}; path=/; expires=${expireDate.toUTCString()}`;
+        document.cookie = `refreshToken=${responseData.refreshToken}; path=/; expires=${expireDate.toUTCString()}`;
+        toast.success("Login success");
+        navigate('/dashboard');
+
+      } else{
+        if(response.status === 403){
+          toast.error(responseData.esito.descrizione);
+          return;
+        }
+        toast.error("Invalid Email or password");
+        return;
+      }
     } catch (error) {
+      toast.error("Login error");
       console.error('Errore durante il login:', error);
     } finally {
       setLoading(false);
@@ -65,8 +159,13 @@ const Login = () => {
     setLoading(true);
     try {
       // Effettua una richiesta al backend per avviare il flusso di autenticazione con Google
-      const response = await axios.get('http://localhost:8080/oauth2/authorization/google');
-
+      //const response = await axios.get('http://localhost:8080/oauth2/authorization/google');
+      const response = await fetch(BASE_PATH+"/oauth2/authorization/google", {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+            });
       // Se la richiesta ha successo, reindirizza l'utente al flusso di autenticazione di Google
       window.location.href = response.data.authorizationUrl;
 
@@ -108,7 +207,7 @@ const Login = () => {
           </form>
           {error && <p className="text-red-500">{error}</p>}
           <div className="mt-4 flex justify-between">
-            <a href="#" className="text-sm underline transition-colors hover:text-color-1">
+            <a href="#" className="text-sm underline transition-colors hover:text-color-1"   onClick={handleModalOpen}>
               Forgot password?
             </a>
           </div>
@@ -139,6 +238,54 @@ const Login = () => {
           </p>
         </div>
       </div>
+      {showModal && (
+        <div className="fixed z-10 inset-0 overflow-y-auto">
+          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div className="fixed inset-0 transition-opacity" aria-hidden="true">
+              <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+
+            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+              <div className="bg-slate-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div className="sm:flex sm:items-start">
+                  <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                    <h3 className="text-lg leading-6 font-medium text-white">Recupera password</h3>
+                    <div className="mt-2">
+                      <p className="text-sm text-gray-300 mb-2">Inserisci la tua email:</p>
+                      <input
+                        type="email"
+                        className="border rounded-lg w-full px-4 py-2 mb-4"
+                        placeholder="youremail@domain.com"
+                        value={emailToReset}
+                        onChange={handleEmailChange}
+                      />
+                      {errorEmail && <p className="text-red-500">{errorEmail}</p>}
+
+                      <button
+                        className="w-full bg-white hover:bg-gray-200 hover:text-blue-800 text-black py-2 rounded-md"
+                        onClick={handleSendEmail}
+                      >
+                        Invia
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-slate-800 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button
+                  type="button"
+                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-white text-base font-medium text-black hover:bg-gray-200 hover:text-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 sm:ml-3 sm:w-auto sm:text-sm"
+                  onClick={handleModalClose}
+                >
+                  Chiudi
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </Section>
   );
 };
