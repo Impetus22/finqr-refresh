@@ -1,13 +1,18 @@
 import finqrlogo from '../assets/finqr-logo-header.png'; //TODO: mettere logo
 import {navigation} from "../constants";
+import {navigationLogged} from "../constants";
 import { Link, useLocation } from 'react-router-dom';
 import Button from './Button';
 import { useState } from 'react';
 import MenuSvg from '../assets/svg/MenuSvg';
 import { HamburgerMenu } from './design/Header';
 import { disablePageScroll, enablePageScroll } from 'scroll-lock';
+import { useAuth } from '../AuthProvider';
+import { FaUser } from 'react-icons/fa';
+
 
 const Header = () => {
+    const { tokens } = useAuth();
 
     const pathname = useLocation();
     const [openNavigation, setOpenNavigation] = useState(false);
@@ -40,22 +45,35 @@ const Header = () => {
         </a>
         <nav className={`${openNavigation ? "flex" : "hidden"} fixed top-[5rem] left-0 right-0 bottom-0 bg-n-8 lg:static lg:flex lg:mx-auto lg:bg-transparent`}>
             <div className="relative z-2 flex flex-col items-center justify-center m-auto lg:flex-row">
-            {navigation.map((item) => (
-                <Link to = {item.url} onClick={() => handleClickLoad(item.url)}><a key={item.id} onClick={handleClick} className={`block relative font-code text-2xl uppercase text-n-1 transition-colors hover:text-color-1 ${item.onlyMobile ? "lg:hidden":""} px-6 py-6 md:py-8 lg:-mr-0.25 lg:text-xs lg:font-semibold ${item.url ===pathname.hash ? "z-2 lg:text-n-1" : "lg:text-n-1/50"} lg:leading-5 lg:hover:text-n-1 xl:px-12`} >
-                    {item.title}
-                </a>
-                </Link>
-            ))}
+            {tokens.accessToken && tokens.refreshToken ? navigationLogged.map((item) => (
+                            <Link to = {item.url} onClick={() => handleClickLoad(item.url)}><a key={item.id} onClick={handleClick} className={`block relative font-code text-2xl uppercase text-n-1 transition-colors hover:text-color-1 ${item.onlyMobile ? "lg:hidden":""} px-6 py-6 md:py-8 lg:-mr-0.25 lg:text-xs lg:font-semibold ${item.url ===pathname.hash ? "z-2 lg:text-n-1" : "lg:text-n-1/50"} lg:leading-5 lg:hover:text-n-1 xl:px-12`} >
+                                {item.title}
+                            </a>
+                            </Link>
+                        )) : navigation.map((item) => (
+                            <Link to = {item.url} onClick={() => handleClickLoad(item.url)}><a key={item.id} onClick={handleClick} className={`block relative font-code text-2xl uppercase text-n-1 transition-colors hover:text-color-1 ${item.onlyMobile ? "lg:hidden":""} px-6 py-6 md:py-8 lg:-mr-0.25 lg:text-xs lg:font-semibold ${item.url ===pathname.hash ? "z-2 lg:text-n-1" : "lg:text-n-1/50"} lg:leading-5 lg:hover:text-n-1 xl:px-12`} >
+                                {item.title}
+                            </a>
+                            </Link>
+                        ))}
             </div>
             <HamburgerMenu></HamburgerMenu>
         </nav>
-        <Link to = "/register">
+        {tokens.accessToken && tokens.refreshToken ? (<><Link to = "/profile">
+        <a className="button hidden mr-8 text-n-1/50 transition-colors hover:text-n-1 lg:block">
+        <FaUser className="inline-block mr-1" /> {/* Icona del profilo */}
+            {tokens.name}</a>
+        </Link>
+        <Link to = "/logout"><Button className="hidden lg:flex" href="/login">Logout</Button></Link>
+        <Button className="ml-auto lg:hidden" px="px-3" onClick={toggleNavigation}>
+            <MenuSvg openNavigation={openNavigation}/>
+        </Button></>) : (<><Link to = "/register">
         <a className="button hidden mr-8 text-n-1/50 transition-colors hover:text-n-1 lg:block">Register</a>
         </Link>
         <Link to = "/login"><Button className="hidden lg:flex" href="/login">Login</Button></Link>
         <Button className="ml-auto lg:hidden" px="px-3" onClick={toggleNavigation}>
             <MenuSvg openNavigation={openNavigation}/>
-        </Button>
+        </Button> </>)}
         </div>
     </div>
 

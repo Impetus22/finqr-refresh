@@ -19,7 +19,9 @@ const Purchase = () => {
 
 
   return (
-    <Section className="pt-[10rem] lg:-mt-[5.25rem] -mt-[9.25rem] ">
+
+    <Section className="pt-[10rem] lg:-mt-[5.25rem] -mt-[9.25rem] " crossesOffset="lg:translate-y-[5.25rem]"
+    id="purchase">
       <div className="mx-auto flex-grow w-full mt-10 mb-10 max-w-[1200px] px-5">
       <div className="container mx-auto border px-5 py-5 shadow-sm md:w-1/2 rounded-lg">
 

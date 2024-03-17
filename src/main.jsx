@@ -12,9 +12,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     authName={"_auth"}
     cookieDomain={window.location.hostname}
     cookieSecure={false}> {/* TODO: settare true in caso di https */}
-    <Router>
       <App />
-    </Router>
     </AuthProvider>
   ,
 )

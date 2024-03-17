@@ -7,7 +7,7 @@ import { GradientLight } from './design/Howto'
 
 const Howto = () => {
   return (
-    <Section id="features" crosses>
+    <Section id="features" crosses >
       <div className="container relative z-2">
         <Heading
           className="md:max-w-md lg:max-w-2xl"

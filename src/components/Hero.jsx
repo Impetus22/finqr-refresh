@@ -5,10 +5,9 @@ import Button from './Button';
 const Hero = () => {
   return (
     <Section
-      className="pt-[12rem] -mt-[5.25rem]"
+      className="pt-[10rem] -mt-[5.25rem]"
       crosses
       crossesOffset="lg:translate-y-[5.25rem]"
-      customPaddings
       id="hero"
     >
               <div className="container relative" >

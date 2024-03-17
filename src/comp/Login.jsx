@@ -7,10 +7,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { disablePageScroll, enablePageScroll } from 'scroll-lock';
 import toast from 'react-hot-toast';
 import { BASE_PATH } from '../constants';
+import { useAuth } from '../AuthProvider';
 
 
 
 const Login = () => {
+  const { setToken } = useAuth();
 
   const [loading, setLoading] = useState(false);
 
@@ -132,10 +134,8 @@ const Login = () => {
 
       if (response.status === 200) {
               //todo settare cookie con tempo giusto ecc..
-        const expireDate = new Date();
-        expireDate.setDate(expireDate.getDate() + 1);
-        document.cookie = `accessToken=${responseData.token}; path=/; expires=${expireDate.toUTCString()}`;
-        document.cookie = `refreshToken=${responseData.refreshToken}; path=/; expires=${expireDate.toUTCString()}`;
+        setToken(responseData.token,responseData.refreshToken);
+
         toast.success("Login success");
         navigate('/dashboard');
 
@@ -181,8 +181,13 @@ const Login = () => {
 
 
   return (
-    <Section >
-      <div className="mx-auto flex-grow w-full mt-10 mb-10 max-w-[1200px] px-5" >
+    <Section
+    className="pt-[10rem] -mt-[5.25rem]"
+    crosses
+    crossesOffset="lg:translate-y-[5.25rem]"
+    id="login"
+  >
+      <div className="mx-auto flex-grow w-full mt-0 mb-2 max-w-[1200px] px-5" >
         <div className="container mx-auto border px-5 py-5 shadow-sm md:w-1/2 rounded-lg">
           <div className=" flex flex-col items-center">
             <p className="text-4xl font-bold">Login</p>

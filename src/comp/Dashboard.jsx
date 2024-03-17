@@ -7,27 +7,25 @@ import { Link } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
 import { BASE_PATH } from '../constants';
 import toast from 'react-hot-toast';
+import { useAuth } from '../AuthProvider';
+
 
 
 const Dashboard = () => {
+  const { tokens } = useAuth();
+  console.log("TOKENSS:",tokens)
   const [isLoading, setIsLoading] = useState(true);
   const [fetchDataResult, setFetchDataResult] = useState(null); // Nuova variabile di stato
   const [qrList, setQrList] = useState([]);
 
   const [state, setState] = useState(() => {
-    // Recupera i token dai cookie
-    const cookies = document.cookie.split('; ');
-    const accessTokenCookie = cookies.find(cookie => cookie.startsWith('accessToken'));
-    const refreshTokenCookie = cookies.find(cookie => cookie.startsWith('refreshToken'));
+    console.log("HERE YA GO",tokens)
     
-    // Se sono presenti token nei cookie, restituisci gli stati con i valori dei token
-    if (accessTokenCookie && refreshTokenCookie) {
-      const accessToken = accessTokenCookie.split('=')[1];
-      const refreshToken = refreshTokenCookie.split('=')[1];
+    if (tokens.accessToken && tokens.refreshToken) {
       return {
         confirmed: true,
-        token: accessToken,
-        refreshToken: refreshToken,
+        token: tokens.accessToken,
+        refreshToken: tokens.refreshToken,
         cookies: true,
         loggedIn: true
       };}else{
@@ -133,6 +131,8 @@ const Dashboard = () => {
     setIsLoading(false);
     toast.success("Email confirmed!");
     } if(state.loggedIn){
+      //caso in cui è expired token non va molto bene 
+      setIsLoading(false)
       return
     }
 
@@ -150,7 +150,7 @@ const Dashboard = () => {
   const flippableCards = qrList.map((qr, index) => (
     <FlippableCard
         key={index}
-        uuid="uuid"//{qr.uuid}
+        uuid={qr.uuid}//{qr.uuid}
         text="text"       //{qr.text}
         available={true}
         rewardType={qr.rewardModality}
@@ -184,7 +184,9 @@ const Dashboard = () => {
   };
 
   return (
-    <Section className="pt-[10rem] -mt-[8.25rem] -mb-[-3rem]" crosses>
+
+    <Section className="pt-[10rem] -mt-[5.25rem] -mb-[0rem]" crosses     crossesOffset="lg:translate-y-[5.25rem]"
+>
       {console.log("STATE",state)}
       {isLoading ? (
       // Mostra il codice per la pagina di caricamento se isLoading è true
@@ -194,15 +196,6 @@ const Dashboard = () => {
       </div>
     ) : (
       <>
-        {!state.confirmed && (
-          // Mostra "devi autenticarti per accedere" se non sei autenticato e non hai confermato
-          <div className="text-center">
-            <h5 className="h5 mb-3">You need to login to access this page</h5>
-            <Link to="/login" className="text-blue-500 hover:underline">
-              Login
-            </Link>
-          </div>
-        )}
         {state.confirmed && (
           // Mostra il contenuto della sezione se lo stato è confermato
           <>
@@ -211,7 +204,7 @@ const Dashboard = () => {
             </div>
 
             {qrList.length === 0 ? (
-                <div className="text-center mb-4">
+                <div className="text-center mb-20">
                   <p className="mb-2">Oh no, no QRs available.</p>
                   <Link to="/purchase" className="text-blue-500 hover:underline">
                     Get yours now
