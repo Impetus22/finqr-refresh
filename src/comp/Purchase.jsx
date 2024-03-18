@@ -1,6 +1,9 @@
 import React, { useState } from 'react'
 import Section from '../components/Section'
 import { FaStripe, FaPaypal } from 'react-icons/fa';
+import { useAuth } from '../AuthProvider';
+import { BASE_PATH } from '../constants';
+import toast from 'react-hot-toast';
 
 const Purchase = () => {
 
@@ -9,11 +12,76 @@ const Purchase = () => {
   const [objectAssociated, setObjectAssociated] = useState('');
   const [description, setDescription] = useState('');
   const [contact, setContact] = useState('');
+  const { tokens } = useAuth();
+  const [error, setError] = useState('');
+  const [loadingPaypal, setLoadingPaypal] = useState(false);
+  const [loadingStripe, setLoadingStripe] = useState(false);
+
+
 
   // Funzione per gestire la sottomissione del form
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Esegui qui la logica per inviare i dati del form
+  const handleSubmit = async (paymentOption) => {
+    setError('');
+    if (paymentOption === 'paypal') {
+      setLoadingPaypal(true);
+    }
+    else{
+      setLoadingStripe(true);
+    }
+    if (isNaN(parseFloat(rewardAmount)) || parseFloat(rewardAmount) <= 0) {
+      setError('Please enter a valid reward amount.');
+      if (paymentOption === 'paypal') {
+        setLoadingPaypal(false);
+      }
+      else{
+        setLoadingStripe(false);
+      }
+      return;
+    }
+    if (rewardAmount.trim() === '' || objectAssociated.trim() === '' || description.trim() === '' || contact.trim() === '') {
+      setError('Please fill in all fields.');
+      if (paymentOption === 'paypal') {
+        setLoadingPaypal(false);
+      }
+      else{
+        setLoadingStripe(false);
+      }
+
+      return;
+    }
+
+    const urlRequest = paymentOption === "paypal" ? "/api/v1/user/paypal/checkout/hosted" : "/api/v1/user/stripe/checkout/hosted";
+
+    try {
+      const response = await fetch(BASE_PATH + urlRequest, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${tokens.accessToken}`, // Assicurati di includere l'access token nell'intestazione
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ rewardModality,rewardAmount,objectAssociated,description,contact })
+
+      });
+      const data = await response.json();
+      if(response.status===200){
+        window.location.href = data.checkoutUrl;
+
+        console.log("REDIRECT:",data.checkoutUrl)
+      }else{
+        toast.error("error generating checkout")
+      }
+
+    } catch (error) {
+      //todo gestire errori
+      console.error('ERRORE', error);
+    }
+    finally {
+      if (paymentOption === 'paypal') {
+        setLoadingPaypal(false);
+      } else if (paymentOption === 'stripe') {
+        setLoadingStripe(false);
+      }
+    }
   };
 
 
@@ -29,7 +97,6 @@ const Purchase = () => {
             <p className="text-4xl font-bold">Purchase your QR</p>
           </div>
 
-        <form className="mt-6 flex flex-col" onSubmit={handleSubmit}>
         <div className="mb-4 flex flex-col md:flex-row md:items-center">
   <label htmlFor="rewardModality" className="block mb-1 md:mb-0 md:mr-4">Reward Modality:</label>
   <div>
@@ -59,15 +126,47 @@ const Purchase = () => {
             <label htmlFor="contact" className="block mb-1">Contact:</label>
             <input type="text" name="contact" value={contact} onChange={(e) => setContact(e.target.value)} className="w-full border  rounded-lg px-3 py-2 bg-n-8" />
           </div>
+          {error && <p className="text-red-500">{error}</p>}
           <div className="flex justify-between space-x-4">
-  <button type="submit" className="bg-purple-600 hover:bg-purple-800 text-white font-bold py-2 px-2 rounded flex items-center">
-    Pay with cart <FaStripe className="ml-2" />
-  </button>
-  <button type="submit" className="bg-blue-600 hover:bg-blue-800 text-white font-bold py-2 px-2 rounded flex items-center">
-    Pay with PayPal <FaPaypal className="ml-2" />
-  </button>
+          <button
+              onClick={() => handleSubmit('stripe')}
+              type="button"
+              className="bg-violet-600 hover:bg-violet-800 text-white font-bold py-2 px-2 rounded flex items-center"
+              disabled={loadingStripe}
+            >
+              {loadingStripe ? (
+                <svg className="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0c4.418 0 8 3.582 8 8s-3.582 8-8 8v-4H4z"
+                  ></path>
+                </svg>
+              ) : (
+                <>Pay with cart <FaStripe className="ml-2" /></>
+              )}
+            </button>
+  <button
+              onClick={() => handleSubmit('paypal')}
+              type="button"
+              className="bg-blue-600 hover:bg-blue-800 text-white font-bold py-2 px-2 rounded flex items-center"
+              disabled={loadingPaypal}
+            >
+              {loadingPaypal ? (
+                <svg className="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0c4.418 0 8 3.582 8 8s-3.582 8-8 8v-4H4z"
+                  ></path>
+                </svg>
+              ) : (
+                <>Pay with PayPal <FaPaypal className="ml-2" /></>
+              )}
+            </button>
 </div>
-        </form>
         </div>
       </div>
     </Section>

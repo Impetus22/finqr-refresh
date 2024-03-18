@@ -44,12 +44,19 @@ import {
   
     // Function to set the authentication token
     const setToken = (accessToken, refreshToken) => {
-      const accessTokenPayload = jwtDecode(accessToken);
-      const name = accessTokenPayload.name;
-      setTokens({accessToken, refreshToken, name});
+      if (!accessToken || !refreshToken) {
+        // Se uno dei token è vuoto, imposta direttamente i token sul valore vuoto
+        setTokens({ accessToken: '', refreshToken: '', name: '' });
+      } else {
+        // Altrimenti, decodifica il token di accesso e imposta i token normalmente
+        const accessTokenPayload = jwtDecode(accessToken);
+        const name = accessTokenPayload.name;
+        setTokens({ accessToken, refreshToken, name });
+      }
     };
   
 useEffect(() => {
+  console.log("HERE",tokens)
   if (tokens.accessToken !== "" && tokens.refreshToken !== "") {
     //settare anche expires, name ecc
     Cookies.set("accessToken", tokens.accessToken);

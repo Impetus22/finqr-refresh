@@ -1,7 +1,7 @@
 import finqrlogo from '../assets/finqr-logo-header.png'; //TODO: mettere logo
-import {navigation} from "../constants";
+import {BASE_PATH, navigation} from "../constants";
 import {navigationLogged} from "../constants";
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Button from './Button';
 import { useState } from 'react';
 import MenuSvg from '../assets/svg/MenuSvg';
@@ -9,10 +9,15 @@ import { HamburgerMenu } from './design/Header';
 import { disablePageScroll, enablePageScroll } from 'scroll-lock';
 import { useAuth } from '../AuthProvider';
 import { FaUser } from 'react-icons/fa';
+import Cookies from "js-cookie";
+import toast from 'react-hot-toast';
+
 
 
 const Header = () => {
-    const { tokens } = useAuth();
+    const { tokens, setToken } = useAuth();
+
+    const navigate = useNavigate();
 
     const pathname = useLocation();
     const [openNavigation, setOpenNavigation] = useState(false);
@@ -35,6 +40,38 @@ const Header = () => {
         /* if (url === '/dashboard') {
             window.location.href = `${url}?refresh=${Date.now()}`;
         } */
+      };
+
+      const handleLogout = async () => {
+        try {
+            const requestBody = {
+                token: tokens.refreshToken
+              };
+          const response = await fetch(BASE_PATH+'/api/v1/logout', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${tokens.accessToken}`,
+              'Content-Type': 'application/json'
+
+            },
+            body: JSON.stringify(requestBody)
+          });
+          const data = await response.json();
+          console.log("logout:",data)
+          if (response.ok) {
+            // Se la chiamata API ha successo, effettua il logout localmente
+            setToken('', ''); // Imposta i token su vuoti
+            toast.success("Logout success");
+            navigate("/home");
+        } else {
+            // TODO: Se la chiamata API fallisce, gestisci l'errore di conseguenza
+            toast.error("Cannot logout",data.esito.descrizione)
+            console.error('Logout failed:', response.statusText);
+          }
+        } catch (error) {
+            toast.error("Cannot logout")
+          console.error('Logout error:', error);
+        }
       };
 
   return (
@@ -64,7 +101,7 @@ const Header = () => {
         <FaUser className="inline-block mr-1" /> {/* Icona del profilo */}
             {tokens.name}</a>
         </Link>
-        <Link to = "/logout"><Button className="hidden lg:flex" href="/login">Logout</Button></Link>
+        <Button className="hidden lg:flex" onClick={handleLogout}>Logout</Button>
         <Button className="ml-auto lg:hidden" px="px-3" onClick={toggleNavigation}>
             <MenuSvg openNavigation={openNavigation}/>
         </Button></>) : (<><Link to = "/register">

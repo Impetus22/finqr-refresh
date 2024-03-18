@@ -11,6 +11,8 @@ import { ProtectedRoute } from "./ProtectedRoute";
 import Register from "./comp/Register";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import Success from "./comp/Success";
+import Failure from "./comp/Failure";
 
 const Routes = () => {
   const { tokens } = useAuth();
@@ -71,6 +73,26 @@ const Routes = () => {
             <>
               <Header />
               <Purchase />
+              <Footer />
+            </>
+          )
+        },
+        {
+          path: "/success",
+          element: (
+            <>
+              <Header />
+              <Success />
+              <Footer />
+            </>
+          )
+        },
+        {
+          path: "/failure",
+          element: (
+            <>
+              <Header />
+              <Failure />
               <Footer />
             </>
           )

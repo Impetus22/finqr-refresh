@@ -46,7 +46,6 @@ const Login = () => {
     // Aggiungi qui la logica per inviare l'email di recupero password
     setErrorEmail('');
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    console.log(emailToReset)
     if (!emailRegex.test(emailToReset)) {
       setErrorEmail('Email non valida');
       setLoading(false);
