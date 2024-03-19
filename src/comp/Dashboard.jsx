@@ -14,6 +14,7 @@ const Dashboard = () => {
   const { tokens } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [qrList, setQrList] = useState([]);
+  const [showArrows, setShowArrows] = useState(true);
 
   const fetchUserQr = async () => {
     try {
@@ -47,6 +48,7 @@ const Dashboard = () => {
   const flippableCards = qrList.map((qr, index) => (
     <FlippableCard
         key={index}
+        id={qr.id}
         uuid={qr.uuid}//{qr.uuid}
         text="text"       //{qr.text}
         available={true}
@@ -55,7 +57,8 @@ const Dashboard = () => {
         objectAssociated={qr.objectAssociated}
         description={qr.description}
         contact={qr.contact}
-    />
+        setShowArrows={setShowArrows} // Passa la funzione setShowArrows come prop
+        />
 ));
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
 
@@ -96,7 +99,9 @@ const Dashboard = () => {
           // Mostra il contenuto della sezione se lo stato è confermato
           <>
             <div className="relative z-1 max-w-[62rem] mx-auto text-center mb-[0.875rem] md:mb-10 lg:mb-[1.25rem]">
-              <h5 className="h5 mb-3">Welcome {tokens.name}, have a look at your QRs:</h5>
+            {showArrows && (
+                        <h5 className="h5 mb-3">Welcome {tokens.name}, have a look at your QRs:</h5>
+            )}
             </div>
 
             {qrList.length === 0 ? (
@@ -120,11 +125,13 @@ const Dashboard = () => {
 
       <div className="flex justify-center items-center relative">
         <div className="absolute left-4 md:left-60 lg:left-96 top-1/2 transform -translate-y-1/2">
+        {showArrows && (
           <button onClick={prevCard} className={`  focus:outline-none ${currentCardIndex === 0 ? 'text-gray-700 cursor-not-allowed' : 'text-gray-200 cursor-pointer'}`}>
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path>
             </svg>
           </button>
+          )}
         </div>
         
 
@@ -157,12 +164,15 @@ const Dashboard = () => {
 
 
 
-        <div className="absolute right-1 md:right-60 lg:right-96 xl:right-120 top-1/2 transform -translate-y-1/2">
+        <div className="absolute right-1 md:right-60 lg:right-96  top-1/2 transform -translate-y-1/2">
+        {showArrows && (
           <button onClick={nextCard} className={`  focus:outline-none ${currentCardIndex === flippableCards.length - 1 ? 'text-gray-700 cursor-not-allowed' : 'text-gray-200 cursor-pointer'}`}>
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
             </svg>
           </button>
+        )}
+
         </div>
       </div>
           </>
