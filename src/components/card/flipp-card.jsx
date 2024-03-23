@@ -11,7 +11,7 @@ import toast from "react-hot-toast";
 import { AiOutlineEdit, AiOutlineExclamationCircle } from "react-icons/ai";
 
 
-function FlippableCard({ id, uuid, text, available, rewardType, rewardAmount, objectAssociated, description, contact, setShowArrows}) {
+function FlippableCard({ id, uuid, text,emptyQrSequence, available, rewardType, rewardAmount, objectAssociated, description, contact, setShowArrows}) {
 
     const [showFront,setShowFront] = useState(true);
     const [showModal, setShowModal] = useState(false);
@@ -298,6 +298,7 @@ try {
                 <Card
                     uuid={uuid}
                     text={text}
+                    emptyQrSequence={emptyQrSequence}
                     available={available}
                     rewardType={rewardType}
                     rewardAmount={rewardAmount}

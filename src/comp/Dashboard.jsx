@@ -50,7 +50,8 @@ const Dashboard = () => {
         key={index}
         id={qr.id}
         uuid={qr.uuid}//{qr.uuid}
-        text="text"       //{qr.text}
+        text={qr.qrSequence}       //{qr.text}
+        emptyQrSequence={qr.emptyQrSequence}
         available={true}
         rewardType={qr.rewardModality}
         rewardAmount={qr.rewardAmount}

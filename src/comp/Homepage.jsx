@@ -50,19 +50,7 @@ const Homepage = () => {
       // Aggiorna l'URL senza il parametro 'confirmationToken'
       window.history.replaceState({}, document.title, `${window.location.pathname}${urlParams.toString()}`); */
     }
-    
-    const urlParamss = new URLSearchParams(window.location.search);
-    const authResponse = urlParamss.get('authResponse');
-    console.log(authResponse);
-    if (authResponse) {
-      toast.success("Login")
-      signIn({
-        token: authResponse.token,
-        expiresIn: 3600,
-        tokenType: "Bearer",
-        authState: {email: "prova"}
-      })
-    }
+  
   }, []);
   return (
     <>

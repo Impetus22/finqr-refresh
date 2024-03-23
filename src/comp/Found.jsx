@@ -131,7 +131,7 @@ const Found = () => {
                 id="rewardCode"
                 name="rewardCode"
                 className="mt-1 px-4 py-2 block w-full border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="Enter your reward code"
+                placeholder="12345678-abcd-abcd-abcd-123456789112"
                 value={rewardCode}
         onChange={handleChange}
         maxLength={36} // Lunghezza massima dell'UUID con trattini

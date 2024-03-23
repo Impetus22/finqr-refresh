@@ -5,7 +5,7 @@ import "./card.css"
 import "./flip-transition.css"
 
 
-function Card({ uuid, text, available, rewardType, rewardAmount, objectAssociated, description, contact, onClick }) {
+function Card({ uuid, text, emptyQrSequence, available, rewardType, rewardAmount, objectAssociated, description, contact, onClick }) {
 
     const textRef = useRef(null);
     const [copied, setCopied] = useState(false); // Stato per tracciare se il testo è stato copiato con successo
@@ -19,16 +19,14 @@ function Card({ uuid, text, available, rewardType, rewardAmount, objectAssociate
         }
     };
 
-    const handleDownload = () => {
-        // Creazione di un elemento <a> per il download
-        const qrCodeDataURL = document.querySelector('.qrcode-container').toDataURL();
-        const downloadLink = document.createElement('a');
-        downloadLink.href = qrCodeDataURL;
-        downloadLink.download = 'qrcode.png';
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
-    };
+    function downloadImage(imageDataUrl) {
+        const link = document.createElement('a');
+        link.href = imageDataUrl;
+        link.download = 'qr_code.png';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
 
     
 
@@ -68,11 +66,13 @@ function Card({ uuid, text, available, rewardType, rewardAmount, objectAssociate
             </div>
             <div className="card-front">  
             <div className="front-content">
-          <QRCode value={text} size={160} className="qrcode-container"/>
+            {/* <img src={text} alt="QR Code" className="qrcode-container"/> */}
+                 <img src={`data:image/png;base64,${emptyQrSequence}`} alt="QR Code" className="qrcode-container"/>
+          {/* <QRCode value={text} size={160} className="qrcode-container"/> */}
           <div className="status-container">
             <div className={`status-circle ${available ? 'available' : 'unavailable'}`}></div>
             <span className="status-text">{available ? 'Enabled' : 'Disabled'}</span>
-            <div className="download-container" onClick={handleDownload}>
+            <div className="download-container" onClick={() => downloadImage(`data:image/png;base64,${text}`)}>
               <FiDownload className="download-icon" />
               <span className="download-text">Download</span>
             </div>
