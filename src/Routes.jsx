@@ -13,6 +13,7 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Success from "./comp/Success";
 import Failure from "./comp/Failure";
+import Public from "./comp/Public";
 
 const Routes = () => {
   const { tokens } = useAuth();
@@ -45,6 +46,16 @@ const Routes = () => {
         <>
           <Header />
           <Contact />
+          <Footer />
+        </>
+      )
+    },
+    {
+      path: "/public",
+      element: (
+        <>
+          <Header />
+          <Public />
           <Footer />
         </>
       )

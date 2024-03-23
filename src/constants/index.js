@@ -66,17 +66,22 @@ import card6icon from "../assets/card6icon.svg";
     },
     {
       id: "4",
+      title: "public",
+      url: "/public",
+    },
+    {
+      id: "5",
       title: "purchase",
       url: "/purchase",
     },
     {
-      id: "5",
+      id: "6",
       title: "register",
       url: "/register",
       onlyMobile: true,
     },
     {
-      id: "6",
+      id: "7",
       title: "Sign in",
       url: "/login",
       onlyMobile: true,
@@ -111,12 +116,17 @@ import card6icon from "../assets/card6icon.svg";
     },
     {
       id: "5",
+      title: "public",
+      url: "/public",
+    },
+    {
+      id: "6",
       title: "profile",
       url: "/profile",
       onlyMobile: true,
     },
     {
-      id: "6",
+      id: "7",
       title: "Logout",
       url: "/logout",
       onlyMobile: true,

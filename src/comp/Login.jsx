@@ -154,31 +154,6 @@ const Login = () => {
     }
   };
 
-  const handleGoogleLogin = async () => {
-    setLoading(true);
-    try {
-      // Effettua una richiesta al backend per avviare il flusso di autenticazione con Google
-      //const response = await axios.get('http://localhost:8080/oauth2/authorization/google');
-      const response = await fetch(BASE_PATH+"/oauth2/authorization/google", {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        }
-            });
-      // Se la richiesta ha successo, reindirizza l'utente al flusso di autenticazione di Google
-      window.location.href = response.data.authorizationUrl;
-
-      console.log(response)
-
-    } catch (error) {
-      console.error('Errore durante il login con Google:', error);
-      // Gestisci eventuali errori
-    } finally {
-      setLoading(false);
-    }
-  };
-
-
   return (
     <Section
     className="pt-[10rem] -mt-[5.25rem]"
