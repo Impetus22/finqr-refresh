@@ -28,7 +28,7 @@ const Hero = () => {
           <p className="body-1 max-w-3xl mx-auto mb-6 text-n-2 lg:mb-8">
             Generate QR codes to assure the items you wouldn't like to lose
           </p>
-          <Button href="/pricing" white>
+          <Button href="/login" white>
             Get starteed
           </Button>
                 </div>

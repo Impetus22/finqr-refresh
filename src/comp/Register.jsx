@@ -163,10 +163,10 @@ const Register = () => {
               <FaFacebookF />
               Facebook
             </button>
-            <button className="w-1/2 bg-white py-2 text-red-500 rounded-md transition-colors hover:text-orange-500 hover:bg-white flex justify-center gap-4 items-center">
+            <a href="http://localhost:8080/oauth2/authorization/google" className="w-1/2 bg-white py-2 text-red-500 rounded-md transition-colors hover:text-orange-500 hover:bg-white flex justify-center gap-4 items-center">
               <FcGoogle />
               Google
-            </button>
+            </a>
           </div>
           <p className="text-center">
             Already have an account?
